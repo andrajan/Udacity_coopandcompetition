@@ -1,0 +1,72 @@
+import time
+from collections import deque
+import numpy as np
+import torch
+from multiagent import MultiAgent
+
+def train(env,param):
+    start=time.time()
+    scores = []
+    avgscores=[]
+    scores_window = deque(maxlen=100)  # last 100 scores
+    
+    #First we unpack our parameters
+    printyn=param['print']
+    n_steps=param['n_step']
+    n_episodes=param['n_episodes']
+    noise=param['noise']
+    param=param['agentparam']
+    param['print']=printyn
+    agent = MultiAgent(param)
+    
+    brain_name = env.brain_names[0]
+    brain = env.brains[brain_name]
+    
+    for i_episode in range(1, n_episodes+1):
+        env_info = env.reset(train_mode=True)[brain_name]
+        state=env_info.vector_observations
+        score = 0
+        culreward=0
+        steps=0
+        
+        while True:
+            action = agent.act(state)
+            action = [act.detach().numpy() for act in action]
+            env_info=env.step(action)[brain_name]
+            next_state = env_info.vector_observations
+            reward = np.array(env_info.rewards)                   
+            done = np.array(env_info.local_done) 
+            #culmative reward with discount gamma applied
+            culreward+=reward.reshape(-1,1)*param['gamma']**steps
+            steps+=1
+            
+            if steps==n_steps or np.any(done):
+                agent.step(state, action, culreward, next_state, done,n_steps)
+                steps=0
+                culreward=0
+
+
+            state = next_state
+            score += np.max(reward)
+
+            if np.any(done):
+                break 
+        scores_window.append(score)       # save most recent score
+        scores.append(score) 
+        avgscores.append(np.mean(scores_window))
+        if printyn:
+            print('\rEpisode {}\tAverage Score: {:.2f}\tScore: {:.2f}'.format(i_episode, np.mean(scores_window), score), end="")
+        if i_episode % 100 == 0:
+            #torch.save(agent.actionestimator_local.state_dict(), 'checkpoint_actor.pth')
+            #torch.save(agent.Qval_local.state_dict(), 'checkpoint_critic.pth')
+            print('\rEpisode {}\tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_window)))  
+        if np.mean(scores_window)>30 and i_episode>100:
+            ttime=time.time()-start
+            torch.save(agent.actionestimator_local.state_dict(), 'checkpoint_actor.pth')
+            torch.save(agent.Qval_local.state_dict(), 'checkpoint_critic.pth')
+
+            print('Agent took {} hours and {} minutes to solve enviroment in {} episodes'.format(
+                int(ttime/3600),int(ttime%60),i_episode))
+            return scores
+    return scores,avgscores
+

@@ -96,7 +96,7 @@ class Agent():
             
         self.actionestimator_local.train()
         
-        #action=np.clip(action,-1,1)
+        action=np.clip(action,-1,1)
         
         return action
     

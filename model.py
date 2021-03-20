@@ -84,6 +84,3 @@ def reset_parameters(layer,final=False):
     else:
         layer.weight.data.uniform_(*hidden_init(layer))
 
-
-
-
