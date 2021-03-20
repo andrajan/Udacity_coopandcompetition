@@ -3,12 +3,16 @@ from collections import deque
 import numpy as np
 import torch
 from multiagent import MultiAgent
+from torch.utils.tensorboard import SummaryWriter
+
+
 
 def train(env,param):
     start=time.time()
     scores = []
     avgscores=[]
     scores_window = deque(maxlen=100)  # last 100 scores
+    logger=SummaryWriter() #initialize tensorboard logger
     
     #First we unpack our parameters
     printyn=param['print']
@@ -41,7 +45,7 @@ def train(env,param):
             steps+=1
             
             if steps==n_steps or np.any(done):
-                agent.step(state, action, culreward, next_state, done,n_steps)
+                agent.step(state, action, culreward, next_state, done,n_steps,logger)
                 steps=0
                 culreward=0
 
@@ -54,6 +58,7 @@ def train(env,param):
         scores_window.append(score)       # save most recent score
         scores.append(score) 
         avgscores.append(np.mean(scores_window))
+        logger.add_scalar('score',score,i_episode)
         if printyn:
             print('\rEpisode {}\tAverage Score: {:.2f}\tScore: {:.2f}'.format(i_episode, np.mean(scores_window), score), end="")
         if i_episode % 100 == 0:
@@ -68,5 +73,6 @@ def train(env,param):
             print('Agent took {} hours and {} minutes to solve enviroment in {} episodes'.format(
                 int(ttime/3600),int(ttime%60),i_episode))
             return scores
+        logger.close()
     return scores,avgscores
 

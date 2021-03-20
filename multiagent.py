@@ -18,6 +18,7 @@ class MultiAgent():
 
         self.device=param['device']
         param['agent_num']=2
+        self.iter=0
 
         self.multiagent=[Agent(param),Agent(param)]
         self.memory=ReplayBuffer(self.device,self.replay_param)
@@ -27,7 +28,7 @@ class MultiAgent():
         actions=[agent.actionestimator_local(state) for state,agent in zip(total_states,self.multiagent)]
         return actions
     
-    def step(self,state,action,reward,next_state,done,n_step):
+    def step(self,state,action,reward,next_state,done,n_step,logger):
         done=done.reshape(-1,1)
         reward=reward.reshape(-1,1)
         self.memory.add(state,action,reward,next_state,done)
@@ -35,16 +36,17 @@ class MultiAgent():
         if self.batch_size<self.memory.lenmemory():
             for i in range(self.update_times):
                 exp=self.memory.sample()
-                self.learn(exp,n_step)
+                self.learn(exp,n_step,logger)
                 
-    def learn(self,experiences,n_step):
+    def learn(self,experiences,n_step,logger):
         
 
         states,rewards,next_states,actions,dones=experiences
 
         full_states=states.reshape([self.batch_size,-1])
         full_nextstates=next_states.reshape([self.batch_size,-1])
-                          
+        self.iter+=1
+        
         for agent_number,agent in enumerate(self.multiagent):
 
             #distinguish full picture from agent picture
@@ -56,12 +58,13 @@ class MultiAgent():
             
             #calculate loss        
             Qloss=(agent.criticloss(full_states,action,reward,next_state,next_states,done,n_step)).mean()
-
+            
             #backwards pass
             agent.Q_optimizer.zero_grad()
             Qloss.backward()
             torch.nn.utils.clip_grad_norm_(agent.Qval_local.parameters(), 1)
             agent.Q_optimizer.step()
+            
 
             #action loss
             actionsest=agent.actionestimator_local(state)
@@ -71,6 +74,8 @@ class MultiAgent():
             agent.action_optimizer.zero_grad()
             actionloss.backward()
             agent.action_optimizer.step()
+            logger.add_scalars('agent%i loss' % agent_number,{'critic loss': Qloss,
+                            'actor_loss': actionloss}, self.iter)
 
             agent.softupdate(agent.Qval_target,agent.Qval_local)
             agent.softupdate(agent.actionestimator_target,agent.actionestimator_local)
