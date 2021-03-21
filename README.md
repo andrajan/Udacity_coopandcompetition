@@ -1,26 +1,14 @@
 [//]: # (Image References)
 
-[image1]: https://user-images.githubusercontent.com/10624937/42135623-e770e354-7d12-11e8-998d-29fc74429ca2.gif "Trained Agent"
 
 
 # Project 3: Collaboration and Competition
 
 ### Introduction
 
-This project solves thes tennis environment. 
+This project solves thes tennis environment. In the Tennis environment there are two agents; one for each of the rackets. Every time the racket connects with the ball and send the ball over the net it gets a reward of +0.1. If it lets the ball hit the ground or hits the ball out of bounds however, it gets a reward of -0.01. The total score is counted as the maximum reward accumulated over an episode of the two agents. If over 100 episodes the model achieves a score of over 0.5 then the enviroment is considered solved. In our code it will train till it achieves a score of 3, which we can achieve.
 
-![Trained Agent][image1]
-
-In this environment, two agents control rackets to bounce a ball over a net. If an agent hits the ball over the net, it receives a reward of +0.1.  If an agent lets a ball hit the ground or hits the ball out of bounds, it receives a reward of -0.01.  Thus, the goal of each agent is to keep the ball in play.
-
-The observation space consists of 8 variables corresponding to the position and velocity of the ball and racket. Each agent receives its own, local observation.  Two continuous actions are available, corresponding to movement toward (or away from) the net, and jumping. 
-
-The task is episodic, and in order to solve the environment, your agents must get an average score of +0.5 (over 100 consecutive episodes, after taking the maximum over both agents). Specifically,
-
-- After each episode, we add up the rewards that each agent received (without discounting), to get a score for each agent. This yields 2 (potentially different) scores. We then take the maximum of these 2 scores.
-- This yields a single **score** for each episode.
-
-The environment is considered solved, when the average (over 100 episodes) of those **scores** is at least +0.5.
+Each agent has its own observation space that records the velocity and position of the ball and racket, and can respond with two continuous actions; adjusting its position from the net and jumping.
 
 ### Getting Started
 
@@ -34,7 +22,7 @@ The environment is considered solved, when the average (over 100 episodes) of th
 
     (_For AWS_) If you'd like to train the agent on AWS (and have not [enabled a virtual screen](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Training-on-Amazon-Web-Service.md)), then please use [this link](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P3/Tennis/Tennis_Linux_NoVis.zip) to obtain the "headless" version of the environment.  You will **not** be able to watch the agent without enabling a virtual screen, but you will be able to train the agent.  (_To watch the agent, you should follow the instructions to [enable a virtual screen](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Training-on-Amazon-Web-Service.md), and then download the environment for the **Linux** operating system above._)
 
-2. Make sure the correct dependencies are installed. You will need, orch, numpy, mlagents,tensorboard, tensorflow and unity agents. Python must be version 3.6 in order to be compatible with unity agents.
+2. Make sure the correct dependencies are installed, and this app is in your local folder. You will need, pytorch, numpy, mlagents, tensorboard, tensorflow and unity agents. Python must be version 3.6 in order to be compatible with unity agents.
 
 ### Implementation
 
