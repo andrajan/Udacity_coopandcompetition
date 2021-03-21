@@ -62,13 +62,15 @@ def train(env,param):
         if printyn:
             print('\rEpisode {}\tAverage Score: {:.2f}\tScore: {:.2f}'.format(i_episode, np.mean(scores_window), score), end="")
         if i_episode % 100 == 0:
-            #torch.save(agent.actionestimator_local.state_dict(), 'checkpoint_actor.pth')
-            #torch.save(agent.Qval_local.state_dict(), 'checkpoint_critic.pth')
+            for ag_number,ag in enumerate(agent.multiagent):
+                torch.save(ag.actionestimator_local.state_dict(), 'checkpoint_actor%i.pth' % ag_number )
+                torch.save(ag.Qval_local.state_dict(), 'checkpoint_critic%i.pth' % ag_number)
             print('\rEpisode {}\tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_window)))  
-        if np.mean(scores_window)>30 and i_episode>100:
+        if np.mean(scores_window)>3 and i_episode>100:
             ttime=time.time()-start
-            torch.save(agent.actionestimator_local.state_dict(), 'checkpoint_actor.pth')
-            torch.save(agent.Qval_local.state_dict(), 'checkpoint_critic.pth')
+            for ag_number,ag in enumerate(agent.multiagent):
+                torch.save(ag.actionestimator_local.state_dict(), 'checkpoint_actor%i.pth' % ag_number )
+                torch.save(ag.Qval_local.state_dict(), 'checkpoint_critic%i.pth' % ag_number)
 
             print('Agent took {} hours and {} minutes to solve enviroment in {} episodes'.format(
                 int(ttime/3600),int(ttime%60),i_episode))

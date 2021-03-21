@@ -17,8 +17,6 @@ class Actor(nn.Module):
         self.out=nn.Linear(self.layer_units[-1],action_size)
         reset_parameters(self.out,final=True)
         self.outlayer=nn.Sequential(self.out,nn.Tanh())
-        
-
     def forward(self, state):
 
         x = self.hlayers(state)
