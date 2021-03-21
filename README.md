@@ -10,7 +10,7 @@ This project solves thes tennis environment. In the Tennis environment there are
 
 Each agent has its own observation space that records the velocity and position of the ball and racket, and can respond with two continuous actions; adjusting its position from the net and jumping.
 
-To solve this enviroment we implement MADDPG based on a paper by *Lowe et al* 
+To solve this enviroment we implement MADDPG based on a paper by [*Lowe et al* ](https://arxiv.org/pdf/1706.02275.pdf)
 ### Getting Started
 
 1. Download the environment from one of the links below.  You need only select the environment that matches your operating system:
