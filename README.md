@@ -10,7 +10,7 @@ This project solves thes tennis environment. In the Tennis environment there are
 
 Each agent has its own observation space that records the velocity and position of the ball and racket, and can respond with two continuous actions; adjusting its position from the net and jumping.
 
-To solve this enviroment we implement MADDPG based on a paper by [*Lowe et al* ](https://arxiv.org/pdf/1706.02275.pdf). We also include the ability to implement the same multi agent structure but with the D4PG algorithm based on a paper by [*Barth-Maron et al*](https://arxiv.org/pdf/1804.08617.pdf)
+To solve this enviroment we implement MADDPG based on a paper by [*Lowe et al* ](https://arxiv.org/pdf/1706.02275.pdf). We also include the ability to implement the same multi agent structure but with the D4PG algorithm based on a paper by [*Barth-Maron et al*](https://arxiv.org/pdf/1804.08617.pdf). However for us the D4PG did not work as well.
 ### Getting Started
 
 1. Download the environment from one of the links below.  You need only select the environment that matches your operating system:
