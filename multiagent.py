@@ -48,16 +48,24 @@ class MultiAgent():
         self.iter+=1
         
         for agent_number,agent in enumerate(self.multiagent):
-
+            
             #distinguish full picture from agent picture
             state=states[:,agent_number,:]
-            next_state=next_states[:,agent_number,:]
-            action=actions[:,agent_number,:]
+            next_state=next_states[:,agent_number,:]            
+            action=actions[:,agent_number,:]                                 
             done=dones[:,agent_number,:]
             reward=rewards[:,agent_number,:]
             
+            #other agent info
+            oindx=(agent_number+1)%2
+            oppaction=actions[:,oindx,:]
+            onstate=next_states[:,oindx,:]
+            with torch.no_grad(): 
+                onaction=self.multiagent[oindx].actionestimator_local(onstate)
+                
+            
             #calculate loss        
-            Qloss=(agent.criticloss(full_states,action,reward,next_state,next_states,done,n_step)).mean()
+            Qloss=(agent.criticloss(full_states,action,oppaction,reward,next_state,onaction,next_states,done,n_step)).mean()
             
             #backwards pass
             agent.Q_optimizer.zero_grad()
@@ -68,7 +76,7 @@ class MultiAgent():
 
             #action loss
             actionsest=agent.actionestimator_local(state)
-            intuple=(full_states,actionsest)
+            intuple=(full_states,actionsest,oppaction)
 
             actionloss=-(agent.expectedQ(agent.Qval_local(intuple))).mean()
             agent.action_optimizer.zero_grad()
@@ -80,6 +88,6 @@ class MultiAgent():
             agent.softupdate(agent.Qval_target,agent.Qval_local)
             agent.softupdate(agent.actionestimator_target,agent.actionestimator_local)
 
-
+        
 
     

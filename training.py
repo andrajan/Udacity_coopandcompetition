@@ -73,6 +73,6 @@ def train(env,param):
             print('Agent took {} hours and {} minutes to solve enviroment in {} episodes'.format(
                 int(ttime/3600),int(ttime%60),i_episode))
             return scores
-        logger.close()
+    logger.close()
     return scores,avgscores
 

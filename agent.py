@@ -57,14 +57,14 @@ class Agent():
         self.criticparam=param['criticparam']
         self.criticparam['ddpgtype']=param['ddpgtype']
         self.actorparam=param['actorparam']
-
+        self.explorefactor=param['explore_factor']
         #creates our actor and critic
         self.actionestimator_local=Actor(self.state_size,self.action_size,self.seed,self.actorparam).to(self.device)
         self.actionestimator_target=Actor(self.state_size,self.action_size,self.seed,self.actorparam).to(self.device)
         self.action_optimizer=optim.Adam(self.actionestimator_local.parameters(),lr=self.lr_actor)
         
-        self.Qval_local=Critic(self.state_size*2,self.action_size,self.seed,self.criticparam).to(self.device)
-        self.Qval_target=Critic(self.state_size*2,self.action_size,self.seed,self.criticparam).to(self.device)
+        self.Qval_local=Critic(self.state_size*2,self.action_size*2,self.seed,self.criticparam).to(self.device)
+        self.Qval_target=Critic(self.state_size*2,self.action_size*2,self.seed,self.criticparam).to(self.device)
                 
         self.Q_optimizer=optim.Adam(self.Qval_local.parameters(),lr=self.lr_critic,weight_decay=self.l2weights)
         
@@ -89,7 +89,7 @@ class Agent():
         # if noise we add OU noise to each parameter in order to promote exploration early in the training process
         if noise:
             for actionp,noisep in zip (self.actionestimator_local.parameters(),self.noise.sample()):
-                actionp=actionp+noisep
+                actionp=actionp+noisep*self.explorefactor
             
         with torch.no_grad():
             action=self.actionestimator_local(state).to('cpu').numpy()
@@ -101,13 +101,13 @@ class Agent():
         return action
     
             
-    def criticloss(self,state,action,reward,next_state,next_states,done,n_step):
-        qinput=(state,action)
+    def criticloss(self,state,action,oppaction,reward,next_state,onaction,next_states,done,n_step):
+        qinput=(state,action,oppaction)
         Qests=self.Qval_local(qinput)
         
         with torch.no_grad():
             next_action=self.actionestimator_target(next_state)
-            qinput_target=(torch.Tensor(next_states.view(self.batch_size,-1)),torch.Tensor(next_action))
+            qinput_target=(torch.Tensor(next_states.view(self.batch_size,-1)),torch.Tensor(next_action),onaction)
             Qtargets=self.Qval_target(qinput_target)*(1-done)
 
         
