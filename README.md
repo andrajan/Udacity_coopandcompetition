@@ -6,7 +6,7 @@
 
 ### Introduction
 
-This project solves thes tennis environment. In the Tennis environment there are two agents; one for each of the rackets. Every time the racket connects with the ball and send the ball over the net it gets a reward of +0.1. If it lets the ball hit the ground or hits the ball out of bounds however, it gets a reward of -0.01. The total score is counted as the maximum reward accumulated over an episode of the two agents. If over 100 episodes the model achieves a score of over 0.5 then the enviroment is considered solved. In our code it will train till it achieves a score of 3, which we can achieve.
+This project solves the tennis environment. In the Tennis environment there are two agents; one for each of the rackets. Every time the racket connects with the ball and send the ball over the net it gets a reward of +0.1. If it lets the ball hit the ground or hits the ball out of bounds however, it gets a reward of -0.01. The total score is counted as the maximum reward accumulated over an episode of the two agents. If over 100 episodes the model achieves a score of over 0.5 then the enviroment is considered solved. In our code it will train till it achieves a score of 3, which we can achieve.
 
 Each agent has its own observation space that records the velocity and position of the ball and racket, and can respond with two continuous actions; adjusting its position from the net and jumping.
 
