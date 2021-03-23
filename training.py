@@ -25,7 +25,7 @@ def train(env,param):
     
     brain_name = env.brain_names[0]
     brain = env.brains[brain_name]
-    
+    ii=0
     for i_episode in range(1, n_episodes+1):
         env_info = env.reset(train_mode=True)[brain_name]
         state=env_info.vector_observations
@@ -65,16 +65,20 @@ def train(env,param):
             for ag_number,ag in enumerate(agent.multiagent):
                 torch.save(ag.actionestimator_local.state_dict(), 'checkpoint_actor%i.pth' % ag_number )
                 torch.save(ag.Qval_local.state_dict(), 'checkpoint_critic%i.pth' % ag_number)
-            print('\rEpisode {}\tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_window)))  
-        if np.mean(scores_window)>3 and i_episode>100:
+            print('\rEpisode {}\tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_window)))
+        if np.mean(scores_window)>0.5 and i_episode>100 and ii==0:
+            solvedin=i_episode
             ttime=time.time()-start
+            ii=1
+
+        if np.mean(scores_window)>3 and i_episode>100:
             for ag_number,ag in enumerate(agent.multiagent):
                 torch.save(ag.actionestimator_local.state_dict(), 'checkpoint_actor%i.pth' % ag_number )
                 torch.save(ag.Qval_local.state_dict(), 'checkpoint_critic%i.pth' % ag_number)
 
             print('Agent took {} hours and {} minutes to solve enviroment in {} episodes'.format(
-                int(ttime/3600),int(ttime%60),i_episode))
-            return scores
+                int(ttime/3600),int(ttime%60),solvedin))
+            return scores,avgscores
     logger.close()
     return scores,avgscores
 
